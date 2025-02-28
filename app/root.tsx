@@ -32,6 +32,8 @@ import {NotFound} from '~/components/NotFound';
 import favicon from '~/assets/favicon.svg';
 import {seoPayload} from '~/lib/seo.server';
 import styles from '~/styles/app.css?url';
+import '~/assets/xo-builder.base.css?url';
+import '~/assets/wc.css?url';
 import wcJs from '~/assets/wc.js?url';
 
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
