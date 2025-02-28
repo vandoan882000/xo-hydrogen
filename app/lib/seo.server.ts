@@ -3,22 +3,13 @@ import type {
   Article,
   Blog,
   Collection,
+  Image,
   Page,
   Product,
   ProductVariant,
   ShopPolicy,
-  Image,
 } from '@shopify/hydrogen/storefront-api-types';
-import type {
-  Article as SeoArticle,
-  BreadcrumbList,
-  Blog as SeoBlog,
-  CollectionPage,
-  Offer,
-  Organization,
-  Product as SeoProduct,
-  WebPage,
-} from 'schema-dts';
+import type {BreadcrumbList, CollectionPage, Offer} from 'schema-dts';
 
 import type {ShopFragment} from 'storefrontapi.generated';
 
@@ -87,12 +78,14 @@ type ProductRequiredFields = Pick<
   Product,
   'title' | 'description' | 'vendor' | 'seo'
 > & {
-  variants: Array<
-    Pick<
-      ProductVariant,
-      'sku' | 'price' | 'selectedOptions' | 'availableForSale'
-    >
-  >;
+  variants: {
+    nodes: Array<
+      Pick<
+        ProductVariant,
+        'sku' | 'price' | 'selectedOptions' | 'availableForSale'
+      >
+    >;
+  };
 };
 
 function productJsonLd({
@@ -105,7 +98,7 @@ function productJsonLd({
   url: Request['url'];
 }): SeoConfig['jsonLd'] {
   const origin = new URL(url).origin;
-  const variants = product.variants;
+  const variants = product.variants.nodes;
   const description = truncate(
     product?.seo?.description ?? product?.description,
   );
@@ -167,8 +160,8 @@ function product({
   url,
   selectedVariant,
 }: {
-  product: ProductRequiredFields;
-  selectedVariant: SelectedVariantRequiredFields;
+  product: any;
+  selectedVariant: any;
   url: Request['url'];
 }): SeoConfig {
   const description = truncate(
@@ -250,7 +243,7 @@ function collection({
   collection,
   url,
 }: {
-  collection: CollectionRequiredFields;
+  collection: any;
   url: Request['url'];
 }): SeoConfig {
   return {
@@ -395,13 +388,13 @@ function page({
 }): SeoConfig {
   return {
     description: truncate(page?.seo?.description || ''),
-    title: page?.seo?.title ?? page?.title,
+    title: page?.seo?.title ?? page?.title ?? 'Page',
     titleTemplate: '%s | Page',
     url,
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'WebPage',
-      name: page.title,
+      name: page?.title ?? 'Page',
     },
   };
 }

@@ -24,6 +24,7 @@ import {
   type SeoConfig,
 } from '@shopify/hydrogen';
 import invariant from 'tiny-invariant';
+import {XoBuilder} from '@xotiny/xb-react-elements';
 
 import {PageLayout} from '~/components/PageLayout';
 import {GenericError} from '~/components/GenericError';
@@ -31,6 +32,7 @@ import {NotFound} from '~/components/NotFound';
 import favicon from '~/assets/favicon.svg';
 import {seoPayload} from '~/lib/seo.server';
 import styles from '~/styles/app.css?url';
+import wcJs from '~/assets/wc.js?url';
 
 import {DEFAULT_LOCALE, parseMenu} from './lib/utils';
 
@@ -145,36 +147,41 @@ function Layout({children}: {children?: React.ReactNode}) {
   const locale = data?.selectedLocale ?? DEFAULT_LOCALE;
 
   return (
-    <html lang={locale.language}>
-      <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <meta name="msvalidate.01" content="A352E6A0AF9A652267361BBB572B8468" />
-        <link rel="stylesheet" href={styles}></link>
-        <Meta />
-        <Links />
-      </head>
-      <body>
-        {data ? (
-          <Analytics.Provider
-            cart={data.cart}
-            shop={data.shop}
-            consent={data.consent}
-          >
-            <PageLayout
-              key={`${locale.language}-${locale.country}`}
-              layout={data.layout}
+    <XoBuilder.Root>
+      <html lang={locale.language}>
+        <XoBuilder.Root.Head jsUrls={[wcJs]}>
+          <meta charSet="utf-8" />
+          <meta name="viewport" content="width=device-width,initial-scale=1" />
+          <meta
+            name="msvalidate.01"
+            content="A352E6A0AF9A652267361BBB572B8468"
+          />
+          <link rel="stylesheet" href={styles}></link>
+          <Meta />
+          <Links />
+        </XoBuilder.Root.Head>
+        <body>
+          {data ? (
+            <Analytics.Provider
+              cart={data.cart}
+              shop={data.shop}
+              consent={data.consent}
             >
-              {children}
-            </PageLayout>
-          </Analytics.Provider>
-        ) : (
-          children
-        )}
-        <ScrollRestoration nonce={nonce} />
-        <Scripts nonce={nonce} />
-      </body>
-    </html>
+              <PageLayout
+                key={`${locale.language}-${locale.country}`}
+                layout={data.layout}
+              >
+                {children}
+              </PageLayout>
+            </Analytics.Provider>
+          ) : (
+            children
+          )}
+          <ScrollRestoration nonce={nonce} />
+          <Scripts nonce={nonce} />
+        </body>
+      </html>
+    </XoBuilder.Root>
   );
 }
 
